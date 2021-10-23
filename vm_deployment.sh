@@ -11,7 +11,7 @@ cat > /mnt/extra/management.xml <<EOF
   <mac address='52:54:00:8a:8b:cd'/>
   <ip address='192.168.254.1' netmask='255.255.255.0'>
     <dhcp>
-      <range start='192.168.254.2' end='192.168.254.249'/>
+      <range start='192.168.254.2' end='192.168.254.199'/>
       <host mac='52:54:00:8a:8b:c0' name='n0' ip='192.168.254.100'/>
       <host mac='52:54:00:8a:8b:c1' name='n1' ip='192.168.254.101'/>
       <host mac='52:54:00:8a:8b:c2' name='n2' ip='192.168.254.102'/>
@@ -162,7 +162,6 @@ for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "#echo vm.swapp
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo snap install microk8s --classic --channel=1.21"; done
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo usermod -a -G microk8s ubuntu"; done
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo chown -f -R ubuntu ~/.kube"; done
-for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "echo 'alias kubectl="microk8s kubectl"' >> ~/.bashrc"; done
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo microk8s status --wait-ready"; done
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n1 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -233,7 +232,7 @@ EOF"
 
 for i in {1..3}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..3}; do virsh start n$i; done && sleep 10 && virsh list --all
 
-sleep 30
+sleep 90
 
 for i in {1..1}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "microk8s add-node -t eLCTbltkDzxOnSKAkmVMbOPYgSrAieEl"; done
 for i in {2..2}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "microk8s join 192.168.254.101:25000/eLCTbltkDzxOnSKAkmVMbOPYgSrAieEl"; done
