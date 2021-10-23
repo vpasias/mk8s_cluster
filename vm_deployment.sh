@@ -162,6 +162,9 @@ for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "#echo vm.swapp
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo snap install microk8s --classic --channel=1.21"; done
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo usermod -a -G microk8s ubuntu"; done
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo chown -f -R ubuntu ~/.kube"; done
+
+sleep 120
+
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo microk8s status --wait-ready"; done
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n1 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -232,7 +235,7 @@ EOF"
 
 for i in {1..3}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..3}; do virsh start n$i; done && sleep 10 && virsh list --all
 
-sleep 90
+sleep 30
 
 for i in {1..1}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "microk8s add-node -t eLCTbltkDzxOnSKAkmVMbOPYgSrAieEl"; done
 for i in {2..2}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "microk8s join 192.168.254.101:25000/eLCTbltkDzxOnSKAkmVMbOPYgSrAieEl"; done
