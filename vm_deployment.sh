@@ -159,14 +159,6 @@ for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo sysctl --
 
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "#echo vm.swappiness=1 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"; done
 
-for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo snap install microk8s --classic --channel=1.22"; done
-for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo usermod -a -G microk8s ubuntu"; done
-for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo chown -f -R ubuntu ~/.kube"; done
-
-sleep 60
-
-for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo microk8s status --wait-ready"; done
-
 ssh -o "StrictHostKeyChecking=no" ubuntu@n1 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
 # This file describes the network interfaces available on your system
 # For more information, see netplan(5).
@@ -233,4 +225,4 @@ network:
         - 172.16.2.13/24     
 EOF"
 
-for i in {1..3}; do virsh shutdown n$i; done && sleep 60 && virsh list --all && for i in {1..3}; do virsh start n$i; done && sleep 10 && virsh list --all
+for i in {1..3}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..3}; do virsh start n$i; done && sleep 10 && virsh list --all
