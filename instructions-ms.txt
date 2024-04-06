@@ -32,6 +32,8 @@ for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "uname -a"; don
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n1
 
+cat /sys/module/kvm_intel/parameters/nested && cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l && free -h && df -hT && lsblk
+
 sudo snap install openstack --channel 2023.2/edge
 
 
