@@ -8,36 +8,38 @@ cat > /mnt/extra/management.xml <<EOF
   <forward mode='nat'/>
   <bridge name='virbr100' stp='off' macTableManager="kernel"/>
   <mtu size="9216"/>
-  <mac address='52:54:00:8a:8b:cd'/>
-  <ip address='192.168.254.1' netmask='255.255.255.0'>
+  <mac address='52:54:00:8a:8b:8c'/>
+  <ip address='172.16.1.1' netmask='255.255.255.0'>
     <dhcp>
       <range start='192.168.254.2' end='192.168.254.199'/>
-      <host mac='52:54:00:8a:8b:c0' name='n0' ip='192.168.254.100'/>
-      <host mac='52:54:00:8a:8b:c1' name='n1' ip='192.168.254.101'/>
-      <host mac='52:54:00:8a:8b:c2' name='n2' ip='192.168.254.102'/>
-      <host mac='52:54:00:8a:8b:c3' name='n3' ip='192.168.254.103'/>
-      <host mac='52:54:00:8a:8b:c4' name='n4' ip='192.168.254.104'/>
-      <host mac='52:54:00:8a:8b:c5' name='n5' ip='192.168.254.105'/>
-      <host mac='52:54:00:8a:8b:c6' name='n6' ip='192.168.254.106'/>
-      <host mac='52:54:00:8a:8b:c7' name='n7' ip='192.168.254.107'/>
-      <host mac='52:54:00:8a:8b:c8' name='n8' ip='192.168.254.108'/>
-      <host mac='52:54:00:8a:8b:c9' name='n9' ip='192.168.254.109'/>
+      <host mac='52:54:00:8a:8b:c0' name='n0' ip='172.16.1.200'/>
+      <host mac='52:54:00:8a:8b:c1' name='n1' ip='172.16.1.201'/>
+      <host mac='52:54:00:8a:8b:c2' name='n2' ip='172.16.1.202'/>
+      <host mac='52:54:00:8a:8b:c3' name='n3' ip='172.16.1.203'/>
+      <host mac='52:54:00:8a:8b:c4' name='n4' ip='172.16.1.204'/>
+      <host mac='52:54:00:8a:8b:c5' name='n5' ip='172.16.1.205'/>
+      <host mac='52:54:00:8a:8b:c6' name='n6' ip='172.16.1.206'/>
+      <host mac='52:54:00:8a:8b:c7' name='n7' ip='172.16.1.207'/>
+      <host mac='52:54:00:8a:8b:c8' name='n8' ip='172.16.1.208'/>
+      <host mac='52:54:00:8a:8b:c9' name='n9' ip='172.16.1.209'/>
     </dhcp>
   </ip>
-</network>
-EOF
-
-cat > /mnt/extra/cluster.xml <<EOF
-<network>
-  <name>cluster</name>
-  <bridge name="virbr101" stp='off' macTableManager="kernel"/>
-  <mtu size="9216"/> 
 </network>
 EOF
 
 cat > /mnt/extra/service.xml <<EOF
 <network>
   <name>service</name>
+  <bridge name="virbr101" stp='off' macTableManager="kernel"/>
+  <mtu size="9216"/>
+  <mac address='52:54:00:9a:9b:9c'/>
+  <ip address='172.16.2.1' netmask='255.255.255.0'>
+</network>
+EOF
+
+cat > /mnt/extra/cluster.xml <<EOF
+<network>
+  <name>cluster</name>
   <bridge name="virbr102" stp='off' macTableManager="kernel"/>
   <mtu size="9216"/> 
 </network>
@@ -52,13 +54,13 @@ ip a && sudo virsh net-list --all
 sleep 20
 
 # Node 1
-./kvm-install-vm create -c 6 -m 32768 -d 120 -t ubuntu2004 -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c1 n1
+./kvm-install-vm create -c 8 -m 32768 -d 200 -t ubuntu2204 -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c1 n1
 
 # Node 2
-./kvm-install-vm create -c 6 -m 32768 -d 120 -t ubuntu2004 -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c2 n2
+./kvm-install-vm create -c 8 -m 32768 -d 200 -t ubuntu2204 -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c2 n2
 
 # Node 3
-./kvm-install-vm create -c 6 -m 32768 -d 120 -t ubuntu2004 -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c3 n3
+./kvm-install-vm create -c 8 -m 32768 -d 200 -t ubuntu2204 -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c3 n3
 
 sleep 60
 
@@ -109,29 +111,29 @@ sleep 30
 
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo apt update -y"; done
 
-for i in {1..3}; do qemu-img create -f qcow2 vbdnode1$i 120G; done
-for i in {1..3}; do qemu-img create -f qcow2 vbdnode2$i 120G; done
+for i in {1..3}; do qemu-img create -f qcow2 vbdnode1$i 200G; done
+#for i in {1..3}; do qemu-img create -f qcow2 vbdnode2$i 120G; done
 #for i in {1..3}; do qemu-img create -f qcow2 vbdnode3$i 120G; done
 
-for i in {1..3}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode1$i.qcow2 -t vdb n$i; done
-for i in {1..3}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode2$i.qcow2 -t vdc n$i; done
-#for i in {1..3}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode3$i.qcow2 -t vdd n$i; done
+for i in {1..3}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode1$i.qcow2 -t sdb n$i; done
+#for i in {1..3}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode2$i.qcow2 -t sdc n$i; done
+#for i in {1..3}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode3$i.qcow2 -t sdd n$i; done
 
-for i in {1..3}; do virsh attach-interface --domain n$i --type network --source cluster --model e1000 --mac 02:00:aa:0a:01:1$i --config --live; done
-for i in {1..3}; do virsh attach-interface --domain n$i --type network --source service --model e1000 --mac 02:00:aa:0a:02:1$i --config --live; done
+for i in {1..3}; do virsh attach-interface --domain n$i --type network --source service --model virtio --mac 02:00:aa:0a:01:1$i --config --live; done
+#for i in {1..3}; do virsh attach-interface --domain n$i --type network --source cluster --model e1000 --mac 02:00:aa:0a:02:1$i --config --live; done
 
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "cat << EOF | sudo tee /etc/hosts
 127.0.0.1 localhost
-192.168.254.100  n0
-192.168.254.101  n1
-192.168.254.102  n2
-192.168.254.103  n3
-192.168.254.104  n4
-192.168.254.105  n5
-192.168.254.106  n6
-192.168.254.107  n7
-192.168.254.108  n8
-192.168.254.109  n9
+172.16.1.200  n0.example.com
+172.16.1.201  n1.example.com
+172.16.1.202  n2.example.com
+172.16.1.203  n3.example.com
+172.16.1.204  n4.example.com
+172.16.1.205  n5.example.com
+172.16.1.206  n6.example.com
+172.16.1.207  n7.example.com
+172.16.1.208  n8.example.com
+172.16.1.209  n9.example.com
 # The following lines are desirable for IPv6 capable hosts
 ::1 ip6-localhost ip6-loopback
 fe00::0 ip6-localnet
@@ -168,17 +170,10 @@ network:
   ethernets:
     ens3:
       dhcp4: true
-      dhcp6: false     
+      dhcp6: false
     ens11:
       dhcp4: false
-      dhcp6: false    
-      addresses:
-        - 172.16.1.11/24
-    ens12:
-      dhcp4: false
-      dhcp6: false      
-      addresses:
-        - 172.16.2.11/24     
+      dhcp6: false  
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n2 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -193,14 +188,7 @@ network:
       dhcp6: false      
     ens11:
       dhcp4: false
-      dhcp6: false      
-      addresses:
-        - 172.16.1.12/24
-    ens12:
-      dhcp4: false
-      dhcp6: false      
-      addresses:
-        - 172.16.2.12/24     
+      dhcp6: false  
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n3 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -215,14 +203,7 @@ network:
       dhcp6: false      
     ens11:
       dhcp4: false
-      dhcp6: false      
-      addresses:
-        - 172.16.1.13/24
-    ens12:
-      dhcp4: false
-      dhcp6: false      
-      addresses:
-        - 172.16.2.13/24     
+      dhcp6: false    
 EOF"
 
 for i in {1..3}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..3}; do virsh start n$i; done && sleep 10 && virsh list --all
