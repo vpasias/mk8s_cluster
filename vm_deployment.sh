@@ -112,12 +112,12 @@ sleep 30
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo apt update -y"; done
 
 for i in {1..3}; do qemu-img create -f qcow2 vbdnode1$i 200G; done
-#for i in {1..3}; do qemu-img create -f qcow2 vbdnode2$i 120G; done
-#for i in {1..3}; do qemu-img create -f qcow2 vbdnode3$i 120G; done
+#for i in {1..3}; do qemu-img create -f qcow2 vbdnode2$i 200G; done
+#for i in {1..3}; do qemu-img create -f qcow2 vbdnode3$i 200G; done
 
-for i in {1..3}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode1$i.qcow2 -t sdb n$i; done
-#for i in {1..3}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode2$i.qcow2 -t sdc n$i; done
-#for i in {1..3}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode3$i.qcow2 -t sdd n$i; done
+for i in {1..3}; do ./kvm-install-vm attach-disk -d 200 -s /mnt/extra/kvm-install-vm/vbdnode1$i.qcow2 -t vdb n$i; done
+#for i in {1..3}; do ./kvm-install-vm attach-disk -d 200 -s /mnt/extra/kvm-install-vm/vbdnode2$i.qcow2 -t vdc n$i; done
+#for i in {1..3}; do ./kvm-install-vm attach-disk -d 200 -s /mnt/extra/kvm-install-vm/vbdnode3$i.qcow2 -t vdd n$i; done
 
 for i in {1..3}; do virsh attach-interface --domain n$i --type network --source service --model virtio --mac 02:00:aa:0a:01:1$i --config --live; done
 #for i in {1..3}; do virsh attach-interface --domain n$i --type network --source cluster --model e1000 --mac 02:00:aa:0a:02:1$i --config --live; done
