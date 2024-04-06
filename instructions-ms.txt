@@ -30,6 +30,8 @@ cd /mnt/extra/kvm-install-vm && cp /mnt/extra/kvm-install-vm/mk8s_cluster/vm_dep
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo ip a"; done && \
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "uname -a"; done
 
+ssh -o "StrictHostKeyChecking=no" ubuntu@n1
+
 #############################################################################################################
 ################ Delete ########################################################################################
 #############################################################################################################
