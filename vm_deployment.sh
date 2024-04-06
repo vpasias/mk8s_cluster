@@ -33,7 +33,7 @@ cat > /mnt/extra/service.xml <<EOF
   <bridge name="virbr101" stp='off' macTableManager="kernel"/>
   <mtu size="9216"/>
   <mac address='52:54:00:9a:9b:9c'/>
-  <ip address='172.16.2.1' netmask='255.255.255.0'>
+  <ip address='172.16.2.1' netmask='255.255.255.0'/>
 </network>
 EOF
 
@@ -41,7 +41,7 @@ cat > /mnt/extra/cluster.xml <<EOF
 <network>
   <name>cluster</name>
   <bridge name="virbr102" stp='off' macTableManager="kernel"/>
-  <mtu size="9216"/> 
+  <mtu size="9216"/>
 </network>
 EOF
 
