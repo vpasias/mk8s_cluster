@@ -1,2 +1,2 @@
-# MicroK8s Cluster
-MicroK8s Hyperconverged Cluster
+# MicroK8s / MicroStack Cluster
+MicroK8s / MicroStack Hyperconverged Cluster
