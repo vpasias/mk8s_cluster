@@ -36,7 +36,75 @@ cat /sys/module/kvm_intel/parameters/nested && cat /proc/cpuinfo | awk '/^proces
 
 sudo snap install openstack --channel 2023.2/edge
 
+sunbeam prepare-node-script | bash -x && newgrp snap_daemon
 
+sunbeam cluster bootstrap --role control --role compute --role storage
+
+#Management networks shared by hosts (CIDRs, separated by comma) (10.20.20.0/24): 172.16.1.0/24
+#MetalLB address allocation range (supports multiple ranges, comma separated) (10.20.20.10-10.20.20.20): 172.16.1.101-172.16.1.120
+#Disks to attach to MicroCeph: /dev/vdb
+
+sunbeam cluster add --name n2.example.com
+
+#Token: 
+
+exit
+
+ssh -o "StrictHostKeyChecking=no" ubuntu@n2
+
+sudo snap install openstack --channel 2023.2/edge
+
+sunbeam prepare-node-script | bash -x && newgrp snap_daemon
+
+sunbeam cluster join --role control --role compute --role storage \
+   --token 
+
+#Free network interface that will be configured for external traffic [eno1/eno2] (eno1): enp8s0
+
+exit
+
+ssh -o "StrictHostKeyChecking=no" ubuntu@n1
+
+sunbeam cluster add --name n3.example.com
+
+#Token: 
+
+exit
+
+ssh -o "StrictHostKeyChecking=no" ubuntu@n3
+
+sudo snap install openstack --channel 2023.2/edge
+
+sunbeam prepare-node-script | bash -x && newgrp snap_daemon
+
+sunbeam cluster join --role control --role compute --role storage \
+   --token 
+
+#Free network interface that will be configured for external traffic [eno1/eno2] (eno1): enp8s0
+
+exit
+
+ssh -o "StrictHostKeyChecking=no" ubuntu@n1
+
+sunbeam cluster resize
+
+sunbeam configure --openrc demo-openrc
+
+#Local or remote access to VMs [local/remote] (local): remote
+#CIDR of network to use for external networking (10.20.20.0/24): 172.16.2.0/24
+#IP address of default gateway for external network (10.20.20.1): 172.16.2.1
+#Populate OpenStack cloud with demo user, default images, flavors etc [y/n] (y):
+#Username to use for access to OpenStack (demo):
+#Password to use for access to OpenStack (mt********):
+#Network range to use for project network (192.168.122.0/24):
+#Enable ping and SSH access to instances? [y/n] (y):
+#Start of IP allocation range for external network (10.20.20.2): 172.16.2.2
+#End of IP allocation range for external network (10.20.20.254): 172.16.2.254
+#Network type for access to external network [flat/vlan] (flat):
+#Writing openrc to demo-openrc ... done
+#Free network interface that will be configured for external traffic [eno1/eno2] (eno1): enp8s0
+
+sunbeam launch ubuntu --name test
 
 #############################################################################################################
 ################ Delete ########################################################################################
