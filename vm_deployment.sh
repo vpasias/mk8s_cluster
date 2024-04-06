@@ -11,7 +11,7 @@ cat > /mnt/extra/management.xml <<EOF
   <mac address='52:54:00:8a:8b:8c'/>
   <ip address='172.16.1.1' netmask='255.255.255.0'>
     <dhcp>
-      <range start='192.168.254.2' end='192.168.254.199'/>
+      <range start='172.16.1.199' end='172.16.1.254'/>
       <host mac='52:54:00:8a:8b:c0' name='n0' ip='172.16.1.200'/>
       <host mac='52:54:00:8a:8b:c1' name='n1' ip='172.16.1.201'/>
       <host mac='52:54:00:8a:8b:c2' name='n2' ip='172.16.1.202'/>
