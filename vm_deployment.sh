@@ -168,10 +168,10 @@ network:
   version: 2
   renderer: networkd
   ethernets:
-    ens3:
+    enp1s0:
       dhcp4: true
-      dhcp6: false
-    ens11:
+      dhcp6: false      
+    enp8s0:
       dhcp4: false
       dhcp6: false  
 EOF"
@@ -183,10 +183,10 @@ network:
   version: 2
   renderer: networkd
   ethernets:
-    ens3:
+    enp1s0:
       dhcp4: true
       dhcp6: false      
-    ens11:
+    enp8s0:
       dhcp4: false
       dhcp6: false  
 EOF"
@@ -198,12 +198,12 @@ network:
   version: 2
   renderer: networkd
   ethernets:
-    ens3:
+    enp1s0:
       dhcp4: true
       dhcp6: false      
-    ens11:
+    enp8s0:
       dhcp4: false
-      dhcp6: false    
+      dhcp6: false  
 EOF"
 
 for i in {1..3}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..3}; do virsh start n$i; done && sleep 10 && virsh list --all
