@@ -1,1 +1,91 @@
+chmod +x cloudlab-setup-ubuntu-tl.sh && ./cloudlab-setup-ubuntu-tl.sh && \
+sudo apt-get install libvirt-bin genisoimage libguestfs-tools libosinfo-bin virtinst qemu-kvm git vim net-tools wget curl bash-completion python-pip libvirt-daemon-system virt-manager bridge-utils libnss-libvirt libvirt-clients osinfo-db-tools intltool sshpass p7zip-full p7zip-rar -y && \
+sudo sed -i 's/hosts:          files dns/hosts:          files libvirt libvirt_guest dns/' /etc/nsswitch.conf && sudo lsmod | grep kvm && sudo reboot
+#sudo systemctl restart libvirtd && sudo systemctl status libvirtd
 
+screen
+# Press Return to continue
+# detach from session without killing it: Ctrl a d 
+# to see screen sessions: screen -ls
+# detach from closed session: screen -d -r 1990.pts-0.node0
+# enter session: screen -r 1990.pts-0.node0
+# exit a session and terminate it: exit
+
+sudo -i
+
+# Create OS node VMs
+cd /mnt/extra && cat /sys/module/kvm_intel/parameters/nested && cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l && free -h && df -hT && sudo virsh list --all && sudo brctl show && \
+mkdir -p /mnt/extra/virt/images && mkdir -p /mnt/extra/virt/vms && cd /mnt/extra/virt/images && \
+cd /usr/lib/ipxe/qemu/ && wget https://github.com/qemu/qemu/raw/master/pc-bios/efi-e1000e.rom && cd /mnt/extra && \
+wget -O "/mnt/extra/osinfo-db.tar.xz" https://releases.pagure.org/libosinfo/osinfo-db-20210903.tar.xz && sudo osinfo-db-import --local "/mnt/extra/osinfo-db.tar.xz" && \
+cd /mnt/extra/ && git clone https://github.com/giovtorres/kvm-install-vm.git && cd kvm-install-vm
+
+##################################################################################################################################################################################
+######################################## MicroK8s Cluster (https://github.com/vpasias/mk8s_cluster) #############################################################################################################
+##################################################################################################################################################################################
+
+git clone https://github.com/vpasias/mk8s_cluster.git && ls -lah && \
+cd /mnt/extra/kvm-install-vm && cp /mnt/extra/kvm-install-vm/mk8s_cluster/vm_deployment.sh . && chmod +x vm_deployment.sh && ./vm_deployment.sh
+
+for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo ip a"; done && \
+for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "uname -a"; done
+
+for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo snap install microk8s --classic --channel=1.22"; done && \
+for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo usermod -a -G microk8s ubuntu"; done && \
+for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo chown -f -R ubuntu ~/.kube"; done
+
+for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo microk8s status --wait-ready"; done
+
+for i in {1..1}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "microk8s add-node -t eLCTbltkDzxOnSKAkmVMbOPYgSrAieEl"; done && \
+for i in {2..2}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "microk8s join 192.168.254.101:25000/eLCTbltkDzxOnSKAkmVMbOPYgSrAieEl"; done && \
+for i in {3..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "microk8s join 192.168.254.101:25000/eLCTbltkDzxOnSKAkmVMbOPYgSrAieEl"; done
+
+ssh -o "StrictHostKeyChecking=no" ubuntu@n1
+echo 'alias kubectl="microk8s kubectl"' >> ~/.bashrc && source ~/.bashrc
+microk8s status && kubectl get nodes && kubectl get pods -o wide --all-namespaces
+
+# Install add-ons
+microk8s enable dns fluentd helm3 multus 
+microk8s enable ingress metallb:172.16.2.200-172.16.2.230
+
+cat << EOF | tee ingress-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress
+  namespace: ingress
+spec:
+  selector:
+    name: nginx-ingress-microk8s
+  type: LoadBalancer
+  # loadBalancerIP is optional. MetalLB will automatically allocate an IP 
+  # from its pool if not specified. You can also specify one manually.
+  loadBalancerIP: 172.16.2.220
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 443
+EOF
+
+kubectl apply -f ingress-service.yaml
+
+#############################################################################################################
+################ Delete ########################################################################################
+#############################################################################################################
+# virsh console n1
+# virsh shutdown n1
+# virsh start n1
+# virsh list --all
+# for i in {1..3}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..3}; do virsh start n$i; done && sleep 10 && virsh list --all
+
+cd /mnt/extra/kvm-install-vm && \
+for i in {1..3}; do ./kvm-install-vm remove n$i; done && rm -rf vbdnode1* && rm -rf vbdnode2* && virsh net-destroy management && \
+rm -rf /mnt/extra/management.xml && virsh net-destroy cluster && rm -rf /mnt/extra/cluster.xml && virsh net-destroy service && rm -rf /mnt/extra/service.xml && \
+virsh net-undefine management && virsh net-undefine cluster && virsh net-undefine service && \
+rm -rf /root/.ssh/known_hosts && touch /root/.ssh/known_hosts && \
+sudo virsh list --all && sudo brctl show && sudo virsh net-list --all
