@@ -173,7 +173,11 @@ network:
       dhcp6: false
       addresses:
         - 172.16.1.201/24
-      gateway4: 172.16.1.1
+      routes:
+        - to: default
+          via: 172.16.1.1
+          metric: 100
+          on-link: true
     enp8s0:
       dhcp4: false
       dhcp6: false
@@ -191,7 +195,11 @@ network:
       dhcp6: false
       addresses:
         - 172.16.1.202/24
-      gateway4: 172.16.1.1
+      routes:
+        - to: default
+          via: 172.16.1.1
+          metric: 100
+          on-link: true
     enp8s0:
       dhcp4: false
       dhcp6: false
@@ -209,14 +217,17 @@ network:
       dhcp6: false
       addresses:
         - 172.16.1.203/24
-      gateway4: 172.16.1.1
+      routes:
+        - to: default
+          via: 172.16.1.1
+          metric: 100
+          on-link: true
     enp8s0:
       dhcp4: false
       dhcp6: false
 EOF"
 
-for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo netplan apply"; done
-
-sleep 30
+#for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo netplan apply"; done
+#sleep 30
 
 for i in {1..3}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..3}; do virsh start n$i; done && sleep 10 && virsh list --all
