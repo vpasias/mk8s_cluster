@@ -75,11 +75,11 @@ for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo rm -rf /r
 
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo hostnamectl set-hostname n$i.example.com --static"; done
 
-for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo apt update -y && sudo apt-get install -y git vim net-tools wget curl bash-completion apt-utils iperf iperf3 mtr traceroute netcat sshpass socat python3 python3-simplejson xfsprogs locate jq"; done
+for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo apt update -y && sudo apt-get install -y git vim net-tools wget curl bash-completion apt-utils iperf iperf3 mtr traceroute netcat sshpass socat"; done
 
+#for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo apt update -y && sudo apt-get install -y git vim net-tools wget curl bash-completion apt-utils iperf iperf3 mtr traceroute netcat sshpass socat python3 python3-simplejson xfsprogs locate jq"; done
 #for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo apt-get install ntp ntpdate -y && sudo timedatectl set-ntp on"; done
-
-for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo modprobe -v xfs && sudo grep xfs /proc/filesystems && sudo modinfo xfs && sudo mkdir -p /etc/apt/sources.list.d"; done
+#for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo modprobe -v xfs && sudo grep xfs /proc/filesystems && sudo modinfo xfs && sudo mkdir -p /etc/apt/sources.list.d"; done
 
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo chmod -x /etc/update-motd.d/*"; done
 
@@ -143,23 +143,23 @@ ff02::2 ip6-allrouters
 ff02::3 ip6-allhosts
 EOF"; done
 
-for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "cat << EOF | sudo tee /etc/sysctl.d/60-lxd-production.conf
-fs.inotify.max_queued_events=1048576
-fs.inotify.max_user_instances=1048576
-fs.inotify.max_user_watches=1048576
-vm.max_map_count=262144
-kernel.dmesg_restrict=1
-net.ipv4.neigh.default.gc_thresh3=8192
-net.ipv6.neigh.default.gc_thresh3=8192
-net.core.bpf_jit_limit=3000000000
-kernel.keys.maxkeys=2000
-kernel.keys.maxbytes=2000000
-net.ipv4.ip_forward=1
-EOF"; done
+#for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "cat << EOF | sudo tee /etc/sysctl.d/60-lxd-production.conf
+#fs.inotify.max_queued_events=1048576
+#fs.inotify.max_user_instances=1048576
+#fs.inotify.max_user_watches=1048576
+#vm.max_map_count=262144
+#kernel.dmesg_restrict=1
+#net.ipv4.neigh.default.gc_thresh3=8192
+#net.ipv6.neigh.default.gc_thresh3=8192
+#net.core.bpf_jit_limit=3000000000
+#kernel.keys.maxkeys=2000
+#kernel.keys.maxbytes=2000000
+#net.ipv4.ip_forward=1
+#EOF"; done
 
-for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo sysctl --system"; done
+#for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo sysctl --system"; done
 
-for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "#echo vm.swappiness=1 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"; done
+#for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "#echo vm.swappiness=1 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"; done
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n1 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
 # This file describes the network interfaces available on your system
@@ -169,8 +169,10 @@ network:
   renderer: networkd
   ethernets:
     enp1s0:
-      dhcp4: true
-      dhcp6: false      
+      dhcp4: false
+      dhcp6: false
+      addresses:
+        - 172.16.1.201/24
     enp8s0:
       dhcp4: false
       dhcp6: false  
@@ -184,8 +186,10 @@ network:
   renderer: networkd
   ethernets:
     enp1s0:
-      dhcp4: true
-      dhcp6: false      
+      dhcp4: false
+      dhcp6: false
+      addresses:
+        - 172.16.1.202/24
     enp8s0:
       dhcp4: false
       dhcp6: false  
@@ -199,8 +203,10 @@ network:
   renderer: networkd
   ethernets:
     enp1s0:
-      dhcp4: true
-      dhcp6: false      
+      dhcp4: false
+      dhcp6: false
+      addresses:
+        - 172.16.1.203/24
     enp8s0:
       dhcp4: false
       dhcp6: false  
