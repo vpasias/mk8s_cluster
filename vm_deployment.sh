@@ -12,16 +12,16 @@ cat > /mnt/extra/management.xml <<EOF
   <ip address='172.16.0.1' netmask='255.255.255.0'>
     <dhcp>
       <range start='172.16.0.199' end='172.16.0.254'/>
-      <host mac='52:54:00:8a:8b:c0' name='n0' ip='172.16.0.200'/>
-      <host mac='52:54:00:8a:8b:c1' name='n1' ip='172.16.0.201'/>
-      <host mac='52:54:00:8a:8b:c2' name='n2' ip='172.16.0.202'/>
-      <host mac='52:54:00:8a:8b:c3' name='n3' ip='172.16.0.203'/>
-      <host mac='52:54:00:8a:8b:c4' name='n4' ip='172.16.0.204'/>
-      <host mac='52:54:00:8a:8b:c5' name='n5' ip='172.16.0.205'/>
-      <host mac='52:54:00:8a:8b:c6' name='n6' ip='172.16.0.206'/>
-      <host mac='52:54:00:8a:8b:c7' name='n7' ip='172.16.0.207'/>
-      <host mac='52:54:00:8a:8b:c8' name='n8' ip='172.16.0.208'/>
-      <host mac='52:54:00:8a:8b:c9' name='n9' ip='172.16.0.209'/>
+      <host mac='52:54:00:8a:8b:c0' name='n0' ip='172.16.0.100'/>
+      <host mac='52:54:00:8a:8b:c1' name='n1' ip='172.16.0.101'/>
+      <host mac='52:54:00:8a:8b:c2' name='n2' ip='172.16.0.102'/>
+      <host mac='52:54:00:8a:8b:c3' name='n3' ip='172.16.0.103'/>
+      <host mac='52:54:00:8a:8b:c4' name='n4' ip='172.16.0.104'/>
+      <host mac='52:54:00:8a:8b:c5' name='n5' ip='172.16.0.105'/>
+      <host mac='52:54:00:8a:8b:c6' name='n6' ip='172.16.0.106'/>
+      <host mac='52:54:00:8a:8b:c7' name='n7' ip='172.16.0.107'/>
+      <host mac='52:54:00:8a:8b:c8' name='n8' ip='172.16.0.108'/>
+      <host mac='52:54:00:8a:8b:c9' name='n9' ip='172.16.0.109'/>
     </dhcp>
   </ip>
 </network>
@@ -119,16 +119,16 @@ for i in {1..3}; do virsh attach-interface --domain n$i --type network --source 
 
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "cat << EOF | sudo tee /etc/hosts
 127.0.0.1 localhost
-172.16.0.200  n0.example.com
-172.16.0.201  n1.example.com
-172.16.0.202  n2.example.com
-172.16.0.203  n3.example.com
-172.16.0.204  n4.example.com
-172.16.0.205  n5.example.com
-172.16.0.206  n6.example.com
-172.16.0.207  n7.example.com
-172.16.0.208  n8.example.com
-172.16.0.209  n9.example.com
+172.16.0.100  n0.example.com
+172.16.0.101  n1.example.com
+172.16.0.102  n2.example.com
+172.16.0.103  n3.example.com
+172.16.0.104  n4.example.com
+172.16.0.105  n5.example.com
+172.16.0.106  n6.example.com
+172.16.0.107  n7.example.com
+172.16.0.108  n8.example.com
+172.16.0.109  n9.example.com
 # The following lines are desirable for IPv6 capable hosts
 ::1 ip6-localhost ip6-loopback
 fe00::0 ip6-localnet
@@ -137,3 +137,86 @@ ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 ff02::3 ip6-allhosts
 EOF"; done
+
+ssh -o "StrictHostKeyChecking=no" ubuntu@n1 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp1s0:
+      dhcp4: false
+      dhcp6: false
+      addresses:
+        - 172.16.0.101/24
+      routes:
+        - to: default
+          via: 172.16.0.1
+          metric: 100
+          on-link: true
+    enp8s0:
+      dhcp4: false
+      dhcp6: false
+      addresses:
+        - 172.16.1.101/24
+    enp9s0:
+      dhcp4: false
+      dhcp6: false
+EOF"
+
+ssh -o "StrictHostKeyChecking=no" ubuntu@n2 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp1s0:
+      dhcp4: false
+      dhcp6: false
+      addresses:
+        - 172.16.0.102/24
+      routes:
+        - to: default
+          via: 172.16.0.1
+          metric: 100
+          on-link: true
+    enp8s0:
+      dhcp4: false
+      dhcp6: false
+      addresses:
+        - 172.16.1.102/24
+    enp9s0:
+      dhcp4: false
+      dhcp6: false
+EOF"
+
+ssh -o "StrictHostKeyChecking=no" ubuntu@n3 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp1s0:
+      dhcp4: false
+      dhcp6: false
+      addresses:
+        - 172.16.0.103/24
+      routes:
+        - to: default
+          via: 172.16.0.1
+          metric: 100
+          on-link: true
+    enp8s0:
+      dhcp4: false
+      dhcp6: false
+      addresses:
+        - 172.16.1.103/24
+    enp9s0:
+      dhcp4: false
+      dhcp6: false
+EOF"
+
+for i in {1..3}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..3}; do virsh start n$i; done && sleep 10 && virsh list --all
