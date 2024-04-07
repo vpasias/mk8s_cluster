@@ -24,7 +24,7 @@ cd /mnt/extra/ && git clone https://github.com/giovtorres/kvm-install-vm.git && 
 ######################################## MicroK8s Cluster (https://github.com/vpasias/mk8s_cluster) #############################################################################################################
 ##################################################################################################################################################################################
 
-git clone https://github.com/vpasias/mk8s_cluster.git && ls -lah && \
+it clone https://github.com/vpasias/mk8s_cluster.git && ls -lah && \
 cd /mnt/extra/kvm-install-vm && cp /mnt/extra/kvm-install-vm/mk8s_cluster/vm_deployment.sh . && chmod +x vm_deployment.sh && ./vm_deployment.sh
 
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo ip a"; done && \
@@ -34,14 +34,14 @@ ssh -o "StrictHostKeyChecking=no" ubuntu@n1
 
 cat /sys/module/kvm_intel/parameters/nested && cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l && free -h && df -hT && lsblk
 
-sudo snap install openstack --channel 2023.2/edge
+sudo snap install openstack --channel 2023.2
 
 sunbeam prepare-node-script | bash -x && newgrp snap_daemon
 
 sunbeam cluster bootstrap --role control --role compute --role storage
 
 #Management networks shared by hosts (CIDRs, separated by comma) (10.20.20.0/24): 172.16.1.0/24
-#MetalLB address allocation range (supports multiple ranges, comma separated) (10.20.20.10-10.20.20.20): 172.16.1.101-172.16.1.120
+#MetalLB address allocation range (supports multiple ranges, comma separated) (10.20.20.10-10.20.20.20): 172.16.1.201-172.16.1.220
 #Disks to attach to MicroCeph: /dev/vdb
 
 sunbeam cluster add --name n2.example.com
@@ -52,14 +52,14 @@ exit
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n2
 
-sudo snap install openstack --channel 2023.2/edge
+sudo snap install openstack --channel 2023.2
 
 sunbeam prepare-node-script | bash -x && newgrp snap_daemon
 
 sunbeam cluster join --role control --role compute --role storage \
    --token 
 
-#Free network interface that will be configured for external traffic [eno1/eno2] (eno1): enp8s0
+#Free network interface that will be configured for external traffic [eno1/eno2] (eno1): enp9s0
 
 exit
 
@@ -73,7 +73,7 @@ exit
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n3
 
-sudo snap install openstack --channel 2023.2/edge
+sudo snap install openstack --channel 2023.2
 
 sunbeam prepare-node-script | bash -x && newgrp snap_daemon
 
