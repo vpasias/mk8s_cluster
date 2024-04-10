@@ -24,7 +24,7 @@ cd /mnt/extra/ && git clone https://github.com/giovtorres/kvm-install-vm.git && 
 ######################################## MicroK8s Cluster (https://github.com/vpasias/mk8s_cluster) #############################################################################################################
 ##################################################################################################################################################################################
 
-it clone https://github.com/vpasias/mk8s_cluster.git && ls -lah && \
+git clone https://github.com/vpasias/mk8s_cluster.git && ls -lah && \
 cd /mnt/extra/kvm-install-vm && cp /mnt/extra/kvm-install-vm/mk8s_cluster/vm_deployment.sh . && chmod +x vm_deployment.sh && ./vm_deployment.sh
 
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo ip a"; done && \
