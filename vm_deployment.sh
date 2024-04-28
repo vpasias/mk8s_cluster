@@ -143,23 +143,23 @@ ff02::2 ip6-allrouters
 ff02::3 ip6-allhosts
 EOF"; done
 
-#for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "cat << EOF | sudo tee /etc/sysctl.d/60-lxd-production.conf
-#fs.inotify.max_queued_events=1048576
-#fs.inotify.max_user_instances=1048576
-#fs.inotify.max_user_watches=1048576
-#vm.max_map_count=262144
-#kernel.dmesg_restrict=1
-#net.ipv4.neigh.default.gc_thresh3=8192
-#net.ipv6.neigh.default.gc_thresh3=8192
-#net.core.bpf_jit_limit=3000000000
-#kernel.keys.maxkeys=2000
-#kernel.keys.maxbytes=2000000
-#net.ipv4.ip_forward=1
-#EOF"; done
+for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "cat << EOF | sudo tee /etc/sysctl.d/60-lxd-production.conf
+fs.inotify.max_queued_events=1048576
+fs.inotify.max_user_instances=1048576
+fs.inotify.max_user_watches=1048576
+vm.max_map_count=262144
+kernel.dmesg_restrict=1
+net.ipv4.neigh.default.gc_thresh3=8192
+net.ipv6.neigh.default.gc_thresh3=8192
+net.core.bpf_jit_limit=3000000000
+kernel.keys.maxkeys=2000
+kernel.keys.maxbytes=2000000
+net.ipv4.ip_forward=1
+EOF"; done
 
-#for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo sysctl --system"; done
+for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo sysctl --system"; done
 
-#for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "#echo vm.swappiness=1 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"; done
+for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "#echo vm.swappiness=1 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"; done
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n1 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
 # This file describes the network interfaces available on your system
@@ -173,6 +173,9 @@ network:
       dhcp6: false
       addresses:
         - 172.16.1.201/24
+      nameservers:
+        addresses: [8.8.8.8, 8.8.4.4]
+        search: []
       routes:
         - to: default
           via: 172.16.1.1
@@ -195,6 +198,9 @@ network:
       dhcp6: false
       addresses:
         - 172.16.1.202/24
+      nameservers:
+        addresses: [8.8.8.8, 8.8.4.4]      
+        search: []
       routes:
         - to: default
           via: 172.16.1.1
@@ -217,6 +223,9 @@ network:
       dhcp6: false
       addresses:
         - 172.16.1.203/24
+      nameservers:
+        addresses: [8.8.8.8, 8.8.4.4]      
+        search: []
       routes:
         - to: default
           via: 172.16.1.1
