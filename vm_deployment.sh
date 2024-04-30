@@ -122,10 +122,9 @@ for i in {1..3}; do ./kvm-install-vm attach-disk -d 200 -s /mnt/extra/kvm-instal
 for i in {1..3}; do virsh attach-interface --domain n$i --type network --source service --model virtio --mac 02:00:aa:0a:01:1$i --config --live; done
 #for i in {1..3}; do virsh attach-interface --domain n$i --type network --source cluster --model e1000 --mac 02:00:aa:0a:02:1$i --config --live; done
 
-for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "cat << EOF | sudo tee /etc/hosts
-127.0.0.1 localhost
+ssh -o "StrictHostKeyChecking=no" ubuntu@n1 "cat << EOF | sudo tee /etc/hosts
+127.0.0.1  localhost  n1.example.com
 172.16.1.200  n0.example.com
-172.16.1.201  n1.example.com
 172.16.1.202  n2.example.com
 172.16.1.203  n3.example.com
 172.16.1.204  n4.example.com
@@ -141,7 +140,47 @@ ff00::0 ip6-mcastprefix
 ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 ff02::3 ip6-allhosts
-EOF"; done
+EOF"
+
+ssh -o "StrictHostKeyChecking=no" ubuntu@n2 "cat << EOF | sudo tee /etc/hosts
+127.0.0.1  localhost  n2.example.com
+172.16.1.200  n0.example.com
+172.16.1.201  n1.example.com
+172.16.1.203  n3.example.com
+172.16.1.204  n4.example.com
+172.16.1.205  n5.example.com
+172.16.1.206  n6.example.com
+172.16.1.207  n7.example.com
+172.16.1.208  n8.example.com
+172.16.1.209  n9.example.com
+# The following lines are desirable for IPv6 capable hosts
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+EOF"
+
+ssh -o "StrictHostKeyChecking=no" ubuntu@n3 "cat << EOF | sudo tee /etc/hosts
+127.0.0.1  localhost  n3.example.com
+172.16.1.200  n0.example.com
+172.16.1.201  n1.example.com
+172.16.1.202  n2.example.com
+172.16.1.204  n4.example.com
+172.16.1.205  n5.example.com
+172.16.1.206  n6.example.com
+172.16.1.207  n7.example.com
+172.16.1.208  n8.example.com
+172.16.1.209  n9.example.com
+# The following lines are desirable for IPv6 capable hosts
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+EOF"
 
 for i in {1..3}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "cat << EOF | sudo tee /etc/sysctl.d/60-lxd-production.conf
 fs.inotify.max_queued_events=1048576
