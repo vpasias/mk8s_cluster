@@ -54,14 +54,14 @@ ip a && sudo virsh net-list --all
 sleep 20
 
 # Node 1
-./kvm-install-vm create -c 8 -m 32768 -d 200 -t ubuntu2204 -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c1 n1
-
+./kvm-install-vm create -c 8 -m 32768 -d 200 -t ubuntu2204 -f host -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c1 n1
+# Change to: host-passthrough
 # Node 2
-./kvm-install-vm create -c 8 -m 32768 -d 200 -t ubuntu2204 -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c2 n2
-
+./kvm-install-vm create -c 8 -m 32768 -d 200 -t ubuntu2204 -f host -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c2 n2
+# Change to: host-passthrough
 # Node 3
-./kvm-install-vm create -c 8 -m 32768 -d 200 -t ubuntu2204 -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c3 n3
-
+./kvm-install-vm create -c 8 -m 32768 -d 200 -t ubuntu2204 -f host -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c3 n3
+# Change to: host-passthrough
 sleep 60
 
 virsh list --all && brctl show && virsh net-list --all
